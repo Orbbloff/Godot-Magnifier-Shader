@@ -1,4 +1,3 @@
-```GLSL
 /*
     This is a magnifier shader written in Godot Shading Language which is similar to GLSL ES 3.0. 
     
@@ -74,4 +73,3 @@ void fragment(){
            }
        }
    }
-```
