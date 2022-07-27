@@ -1,7 +1,4 @@
-[gd_resource type="Shader" format=2]
-
-[resource]
-code = "/*
+/*
     This is a magnifier shader written in Godot Shading Language which is similar to GLSL ES 3.0. 
     
     In order to get this shader working, you must attach this to a node with a texture.
@@ -13,7 +10,7 @@ code = "/*
 */
 shader_type canvas_item;
 
-uniform bool is_object_centered;
+uniform bool is_object_centered; // Note that this needs to match with the sprite's centered property
 uniform float magnification:hint_range(0.0, 400.0) = 2.0;
 uniform bool filtering;
 uniform bool is_round;
@@ -76,4 +73,3 @@ void fragment(){
            }
        }
    }
-"
