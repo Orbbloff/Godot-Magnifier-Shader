@@ -22,11 +22,7 @@ uniform vec4 outline_color:hint_color = vec4(0.4, 0.0, 0.0, 1.0);
 varying flat vec2 center_pos;
 
 void vertex() {
-    if (is_object_centered) {
-        center_pos = vec2(0.0, 0.0);
-    } else {
-        center_pos = (1.0 / TEXTURE_PIXEL_SIZE) / 2.0;
-    }
+    center_pos = is_object_centered ? vec2(0.0) : 0.5 / TEXTURE_PIXEL_SIZE; 
     // From local space texel coordinates to screen space pixel coordinates
     center_pos = (WORLD_MATRIX * vec4(center_pos, 0.0, 1.0)).xy;
 }
