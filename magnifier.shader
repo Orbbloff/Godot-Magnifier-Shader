@@ -17,23 +17,22 @@ uniform bool is_round;
 uniform float roundness:hint_range(0.0, 2.0) = 1.0;
 uniform float circle_radius:hint_range(0.0, 0.71) = 0.5;
 uniform float outline_thickness:hint_range(0.0, 0.1) = 0.01;
-uniform vec4 outline_color:hint_color = vec4(0.4, 0.0, 0.0, 1.0);
+uniform vec4 outline_color:source_color = vec4(0.4, 0.0, 0.0, 1.0);
+uniform sampler2D SCREEN_TEXTURE : hint_screen_texture, repeat_disable, filter_nearest;
 
 varying flat vec2 center_pos;
 
 void vertex() {
     center_pos = is_object_centered ? vec2(0.0) : 0.5 / TEXTURE_PIXEL_SIZE; 
     // From local space texel coordinates to screen space pixel coordinates
-    center_pos = (WORLD_MATRIX * vec4(center_pos, 0.0, 1.0)).xy;
+    center_pos = (MODEL_MATRIX * vec4(center_pos, 0.0, 1.0)).xy;
 }
 
 void fragment() {
     vec2 screen_resolution = 1.0 / SCREEN_PIXEL_SIZE;
     vec2 uv_distance = vec2(0.5) - UV; // UV distance between fragment and object center in local space
-    vec2 pixel_distance;               // Pixel distance between fragment and object center
-    pixel_distance.x = center_pos.x - FRAGCOORD.x;
-    pixel_distance.y = center_pos.y - (screen_resolution.y - FRAGCOORD.y); // Since y component of FRAGCOORD built-in is
-                                                                           // inverted it is extracted from screen resolution
+    vec2 pixel_distance = center_pos - FRAGCOORD.xy; // Pixel distance between fragment and object center
+
     vec2 obj_size = pixel_distance / uv_distance; // Ratio of pixel distance to uv distance gives the objects dimensions
     vec2 ratio = obj_size / screen_resolution;    // This gives the ratio of object to screen
 
@@ -48,9 +47,7 @@ void fragment() {
     // Calculates a local UV position towards the center, proportional to magnification
     vec2 local_mapped_uv = mix(UV, vec2(0.5 /*center*/), magnify_value);
     vec2 difference = local_mapped_uv - UV;
-    vec2 global_mapped_uv; // Calculates a global UV position to from screen texture
-    global_mapped_uv.x = SCREEN_UV.x + difference.x * ratio.x;
-    global_mapped_uv.y = SCREEN_UV.y - difference.y * ratio.y;
+    vec2 global_mapped_uv = SCREEN_UV + difference * ratio; // Calculates a global UV position to from screen texture
 
     if (filtering) {
         // Applies filter while reading from screen texture
